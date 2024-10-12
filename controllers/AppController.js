@@ -1,4 +1,4 @@
-import redisClien from '../utils/redis.js';
+import redisClien from '../utils/redis';
 import dbClient from '../utils/db';
 
 class AppController {
