@@ -1,4 +1,4 @@
-import sh1 from 'sha1';
+import sha1 from 'sha1';
 import dbClient from '../utils/db';
 
 class UsersController {
@@ -13,11 +13,12 @@ class UsersController {
       return res.status(400).json({ error: 'Missing password' });
     }
 
-    const hpassword = sh1(password);
+    const hpassword = sha1(password);
 
     const user = await (await dbClient.usersCollection()).findOne({ email });
     if (user) {
-      return res.status(400).json({ error: 'Already exist' });
+      res.status(400).json({ error: 'Already exist' });
+      return
     }
     const insertionInfo = await (await dbClient.usersCollection())
       .insertOne({ email, password: hpassword });
