@@ -7,17 +7,17 @@ class UsersController {
     const password = req.body ? req.body.password : null;
 
     if (!email) {
-      return res.status(400).send({ error: 'Missing email' });
+      return res.status(400).json({ error: 'Missing email' });
     }
     if (!password) {
-      return res.status(400).send({ error: 'Missing password' });
+      return res.status(400).json({ error: 'Missing password' });
     }
 
     const hpassword = sh1(password);
 
     const user = await (await dbClient.usersCollection()).findOne({ email });
     if (user) {
-      return res.status(400).send({ error: 'Already exist' });
+      return res.status(400).json({ error: 'Already exist' });
     }
     const insertionInfo = await (await dbClient.usersCollection())
       .insertOne({ email, password: hpassword });
