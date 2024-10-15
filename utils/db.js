@@ -11,6 +11,10 @@ class DBClient {
     this.db = this.client.db(database);
   }
 
+  async usersCollection() {
+    return this.client.db().collection('users');
+  }
+
   isAlive() {
     return this.client.isConnected();
   }
