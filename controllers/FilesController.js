@@ -1,26 +1,43 @@
 import { ObjectId } from 'mongodb';
+import { v4 as uuidv4 } from 'uuid';
+import { promises as fsPromises } from 'fs';
 import UsersController from './UsersController';
 import dbClient from '../utils/db';
 
-// const FOLDER_PATH = process.env.FOLDER_PATH || '/tmp/files_manager';
+const FOLDER_PATH = process.env.FOLDER_PATH || '/tmp/files_manager';
 
 export default class FilesController {
   static async saveFile(parms) {
     const { name } = parms;
-    const { parentId } = parms;
+    let { parentId } = parms;
     const { userid } = parms;
     const { type } = parms;
     const { isPublic } = parms;
     const { data } = parms;
 
+    if (parentId) parentId = ObjectId(parentId);
+
     const fileData = {
-      userId: userid,
+      userId: ObjectId(userid),
       name,
       type,
       parentId,
       isPublic,
-      data,
     };
+
+    if (type !== 'folder') {
+      const filename = uuidv4();
+      const filePath = `${FOLDER_PATH}/${filename}`;
+      const decodedData = Buffer.from(data, 'base64');
+      fileData.data = decodedData.toString('utf-8');
+
+      try {
+        await fsPromises.mkdir(FOLDER_PATH, { recursive: true });
+        await fsPromises.writeFile(filePath, decodedData);
+      } catch (err) {
+        return { error: 'Cannot create the file', code: 400 };
+      }
+    }
 
     const insertionInfo = await (await dbClient.filesCollection()).insertOne(fileData);
 
