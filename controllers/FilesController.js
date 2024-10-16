@@ -29,7 +29,7 @@ export default class FilesController {
       const filename = uuidv4();
       const filePath = `${FOLDER_PATH}/${filename}`;
       const decodedData = Buffer.from(data, 'base64');
-      fileData.data = decodedData.toString('utf-8');
+      fileData.localPath = filePath;
 
       try {
         const re = await fsPromises.mkdir(FOLDER_PATH, { recursive: true });
