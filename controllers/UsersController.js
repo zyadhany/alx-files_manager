@@ -30,27 +30,31 @@ export default class UsersController {
     res.status(201).json({ email, id: userId });
   }
 
-  static async getMe(req, res) {
+  static async getuserFromAuth(req) {
     const token = req.header('X-Token') || null;
     if (!token) {
-      res.status(401).json({ error: 'Unauthorized' });
-      return;
+      return null;
     }
     const key = `auth_${token}`;
     const userId = await redisClient.get(key);
     if (!userId) {
-      res.status(401).json({ error: 'Unauthorized' });
-      return;
+      return null;
     }
     const user = await (await dbClient.usersCollection()).findOne({
       _id: new mongoDBCore.BSON.ObjectId(userId),
     });
+
+    return user;
+  }
+
+  static async getMe(req, res) {
+    const user = UsersController.getuserFromAuth(req);
 
     if (!user) {
       res.status(401).json({ error: 'Unauthorized' });
       return;
     }
 
-    res.status(200).json({ email: user.email, id: userId });
+    res.status(200).json({ email: user.email, id: user._id });
   }
 }
