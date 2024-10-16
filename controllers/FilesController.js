@@ -32,8 +32,9 @@ export default class FilesController {
       fileData.data = decodedData.toString('utf-8');
 
       try {
-        await fsPromises.mkdir(FOLDER_PATH, { recursive: true });
+        const re = await fsPromises.mkdir(FOLDER_PATH, { recursive: true });
         await fsPromises.writeFile(filePath, decodedData);
+        console.log('data', re);
       } catch (err) {
         return { error: 'Cannot create the file', code: 400 };
       }
@@ -41,7 +42,6 @@ export default class FilesController {
 
     const insertionInfo = await (await dbClient.filesCollection()).insertOne(fileData);
 
-    console.log(insertionInfo);
     const file = {
       id: insertionInfo.insertedId,
       userId: userid,
