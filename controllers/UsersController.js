@@ -48,7 +48,7 @@ export default class UsersController {
   }
 
   static async getMe(req, res) {
-    const user = UsersController.getuserFromAuth(req);
+    const user = await UsersController.getuserFromAuth(req);
 
     if (!user) {
       res.status(401).json({ error: 'Unauthorized' });
